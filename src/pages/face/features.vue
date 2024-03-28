@@ -1,4 +1,3 @@
 <template>
     <FaceFeatures />
 </template>
-  

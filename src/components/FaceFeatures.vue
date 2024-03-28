@@ -1,32 +1,29 @@
 <template>
     <v-container>
         <v-row justify="center">
-            <v-col cols="12" sm="6">
-                <v-card>
-                    <v-card-title class="text-h5 text-center">人脸特征分析</v-card-title>
-                    <v-card-text>
-                        <v-form ref="form" @submit.prevent="submit">
-                            <v-file-input v-model="image" label="选择图片" prepend-icon="mdi-camera"
-                                accept="image/png, image/jpeg, image/bmp" @change="previewImage"></v-file-input>
-                            <v-img v-if="imagePreview" :src="imagePreview" aspect-ratio="1.7"></v-img>
-                            <v-row justify="center" class="my-3">
-                                <v-btn color="primary" type="submit" :disabled="loading">分析</v-btn>
-                            </v-row>
-                        </v-form>
-                        <v-row justify="center" class="mt-3">
-                            <v-progress-circular v-if="loading" indeterminate color="primary"></v-progress-circular>
-                        </v-row>
-                        <v-row class="mt-3">
-                            <v-col cols="12" sm="6" offset-sm="3">
-                                <v-alert v-if="result && !loading" type="info" dense>
-                                    <div v-for="(value, key) in result" :key="key">
-                                        {{ translateResult(key, value) }}
-                                    </div>
-                                </v-alert>
-                            </v-col>
-                        </v-row>
-                    </v-card-text>
-                </v-card>
+            <v-col cols="12" sm="8" md="6" lg="4">
+                <div class="text-h5 text-center mb-4">人脸特征分析</div>
+                <v-form ref="form" @submit.prevent="submit" class="mx-auto" style="max-width: 500px;">
+                    <v-img :src="imagePreview" aspect-ratio="1" class="mb-2 elevation-2" cover
+                        style="background-color: #EEE;"></v-img>
+                    <v-file-input v-model="image" label="选择图片" prepend-icon="mdi-camera"
+                        accept="image/png, image/jpeg, image/bmp" @change="previewImage" outlined dense></v-file-input>
+                    <v-row justify="center" class="my-3">
+                        <v-btn color="primary" type="submit" :disabled="loading">{{ loading ? '分析中...' : '分析' }}</v-btn>
+                    </v-row>
+                </v-form>
+                <v-row justify="center" class="mt-3" v-if="loading">
+                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
+                </v-row>
+                <v-row class="mt-3" v-if="result && !loading">
+                    <v-col cols="12" sm="8" offset-sm="2">
+                        <v-alert type="info" dense>
+                            <template v-for="(value, key) in result">
+                                <div>{{ translateResult(key, value) }}</div>
+                            </template>
+                        </v-alert>
+                    </v-col>
+                </v-row>
             </v-col>
         </v-row>
     </v-container>
@@ -139,3 +136,7 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+/* 适当调整样式以适应新的布局 */
+</style>
