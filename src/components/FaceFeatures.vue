@@ -5,21 +5,28 @@
                 <div class="text-h5 text-center mb-4">人脸特征分析</div>
                 <v-form ref="form" @submit.prevent="submit" class="mx-auto" style="max-width: 500px;">
                     <image-upload v-model="image"></image-upload>
-                    <v-row justify="center" class="my-3">
+                    <v-row justify="center" class="my-0">
                         <v-btn color="primary" type="submit" :disabled="loading">{{ loading ? '分析中...' : '分析' }}</v-btn>
                     </v-row>
                 </v-form>
-                <v-row justify="center" class="mt-3" v-if="loading">
+                <v-row justify="center" class="mb-0 mt-3" v-if="loading">
                     <v-progress-circular indeterminate color="primary"></v-progress-circular>
                 </v-row>
-                <v-row class="mt-3" v-if="result && !loading">
-                    <v-col cols="12" sm="8" offset-sm="2">
-                        <v-alert type="info" dense>
-                            <template v-for="(value, key) in result">
-                                <div>{{ translateResult(key, value) }}</div>
-                            </template>
-                        </v-alert>
-                    </v-col>
+                <v-row class="mb-0 mt-3" v-if="result && !loading">
+                    <v-alert type="info" dense>
+                        <template v-for="(value, key) in result">
+                            <div>{{ translateResult(key, value) }}</div>
+                        </template>
+                    </v-alert>
+                </v-row>
+                <v-row class="info-box mt-3">
+                    <p><strong>注意事项：</strong></p>
+                    <ul>
+                        <li>图片文件仅支持 .jpg/.jpeg/.png/.bmp 格式，图片大小不超过 2M。</li>
+                        <li>请提供清晰的人脸照片，人脸大小不小于 30*30 像素，其中人脸俯仰角、左右偏航角、人脸反转角 60°以内识别效果最好。</li>
+                        <li>人脸比对只可对比图片中主体部分人脸。</li>
+                        <li>建议使用仅包含一张人脸的照片进行比对，若照片中含有多张人脸，引擎会选择其中人脸置信度最高的人脸进行比较，可能会影响比对结果。</li>
+                    </ul>
                 </v-row>
             </v-col>
         </v-row>
