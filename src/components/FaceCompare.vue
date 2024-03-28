@@ -12,19 +12,28 @@
                         <image-upload v-model="image2"></image-upload>
                     </v-col>
                 </v-row>
-                <v-row justify="center">
+                <v-row class="my-0" justify="center">
                     <v-btn color="primary" @click="compareFaces" :disabled="loading">
                         {{ loading ? '分析中...' : '开始比对' }}
                     </v-btn>
                 </v-row>
-                <v-row justify="center" v-if="loading">
+                <v-row class="my-0" justify="center" v-if="loading">
                     <v-progress-circular indeterminate color="primary" class="mt-3"></v-progress-circular>
                 </v-row>
                 <!-- 提示信息或比对结果 -->
-                <v-row v-if="result && !loading">
+                <v-row class="my-0" v-if="result && !loading">
                     <v-alert :type="resultType" class="mt-3">
                         {{ resultMessage }}
                     </v-alert>
+                </v-row>
+                <v-row class="info-box mt-3">
+                    <p><strong>注意事项：</strong></p>
+                    <ul>
+                        <li>图片文件仅支持 .jpg/.jpeg/.png/.bmp 格式，图片大小不超过 2M。</li>
+                        <li>请提供清晰的人脸照片，人脸大小不小于 30*30 像素，其中人脸俯仰角、左右偏航角、人脸反转角 60°以内识别效果最好。</li>
+                        <li>人脸比对只可对比图片中主体部分人脸。</li>
+                        <li>建议使用仅包含一张人脸的照片进行比对，若照片中含有多张人脸，引擎会选择其中人脸置信度最高的人脸进行比较，可能会影响比对结果。</li>
+                    </ul>
                 </v-row>
             </v-col>
         </v-row>
@@ -67,7 +76,7 @@ export default {
                 });
                 // 假设 response.data.data 包含比对结果分数
                 const score = parseFloat(response.data.data);
-                let resultText = `相似度分数：${(score*100).toFixed(2)}。\n`;
+                let resultText = `相似度分数：${(score * 100).toFixed(2)}。\n`;
 
                 if (score > 0.67) {
                     resultText += '高度相似，极有可能是同一个人。';
@@ -89,3 +98,17 @@ export default {
     },
 };
 </script>
+
+<style scoped>
+.info-box {
+    background-color: #f5f5f5;
+    padding: 15px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 0.9rem;
+}
+
+.info-box ul {
+    padding-left: 20px;
+}
+</style>
