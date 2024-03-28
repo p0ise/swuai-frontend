@@ -1,6 +1,6 @@
 <template>
     <div>
-        <v-img :src="imagePreview" aspect-ratio="1" class="mb-2 elevation-2" cover
+        <v-img :src="imagePreview || placeholderImage" aspect-ratio="1" class="mb-2 elevation-2" cover
             style="background-color: #EEE;"></v-img>
         <v-file-input label="选择图片" prepend-icon="mdi-camera" accept="image/png, image/jpeg, image/bmp"
             @update:modelValue="onImageChange" outlined dense>
@@ -9,6 +9,8 @@
 </template>
 
 <script>
+import placeholder from '@/assets/placeholder.png';
+
 export default {
     name: 'ImageUpload',
     props: ['modelValue'],
@@ -17,6 +19,7 @@ export default {
         return {
             imageFile: null,
             imagePreview: null,
+            placeholderImage: placeholder
         };
     },
     methods: {
