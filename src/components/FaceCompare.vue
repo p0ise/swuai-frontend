@@ -100,7 +100,7 @@ export default {
                 this.resultType = 'success';
             } catch (error) {
                 this.result = true;
-                this.resultMessage = '比对过程中出现错误，请稍后再试。';
+                this.resultMessage = '比对过程中出现错误：' + error.response.data.error;
                 this.resultType = 'error';
             } finally {
                 this.loading = false;
