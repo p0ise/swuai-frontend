@@ -4,10 +4,7 @@
             <v-col cols="12" sm="8" md="6" lg="4">
                 <div class="text-h5 text-center mb-4">人脸特征分析</div>
                 <v-form ref="form" @submit.prevent="submit" class="mx-auto" style="max-width: 500px;">
-                    <v-img :src="imagePreview" aspect-ratio="1" class="mb-2 elevation-2" cover
-                        style="background-color: #EEE;"></v-img>
-                    <v-file-input v-model="image" label="选择图片" prepend-icon="mdi-camera"
-                        accept="image/png, image/jpeg, image/bmp" @change="previewImage" outlined dense></v-file-input>
+                    <image-upload v-model="image"></image-upload>
                     <v-row justify="center" class="my-3">
                         <v-btn color="primary" type="submit" :disabled="loading">{{ loading ? '分析中...' : '分析' }}</v-btn>
                     </v-row>
@@ -36,27 +33,17 @@ export default {
     data() {
         return {
             image: null,
-            imagePreview: null,
             result: null,
             loading: false,
         };
     },
     methods: {
-        previewImage() {
-            if (this.image) {
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    this.imagePreview = e.target.result;
-                };
-                reader.readAsDataURL(this.image[0]);
-            }
-        },
         async submit() {
             if (!this.image) return;
 
             this.loading = true; // 开始加载
             const formData = new FormData();
-            formData.append('image', this.image[0]);
+            formData.append('image', this.image);
             try {
                 const response = await axios.post('http://localhost:5000/api/face-features', formData, {
                     headers: {
