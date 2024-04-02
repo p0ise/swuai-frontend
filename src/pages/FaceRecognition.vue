@@ -1,3 +1,0 @@
-<template>
-    <FaceRecognition />
-</template>

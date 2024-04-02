@@ -16,5 +16,12 @@
     </v-container>
 </template>
 
-<script>
+<script setup>
+import { useHead } from '@unhead/vue'
+
+useHead({
+  title: '首页',
+  meta: [
+  ],
+})
 </script>

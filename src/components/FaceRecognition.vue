@@ -4,7 +4,7 @@
     <div id="videoCanvasWrapper">
       <video id="videoElement" ref="videoElement" autoplay playsinline width="640" height="480"></video>
       <canvas id="overlay" ref="overlay" width="640" height="480"></canvas>
-      <div id="videoPlaceholder">摄像头未开启，请点击“开启摄像头”按钮。</div>
+      <div id="videoPlaceholder" ref="videoPlaceholder">摄像头未开启，请点击“开启摄像头”按钮。</div>
     </div>
     <div class="controls">
       <button id="startCamera" @click="startCamera">开启摄像头</button>
@@ -56,7 +56,7 @@ export default {
       const video = this.$refs.videoElement;
       const currentTimestamp = Date.now();
       this.lastSentTimestamp = currentTimestamp;
-      const canvas = document.createElement('canvas');
+      const canvas = document.getElementById('overlay');
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
@@ -120,13 +120,14 @@ export default {
       }
     },
     startCamera() {
+      const that = this;
       if (this.stream === null) {
         navigator.mediaDevices.getUserMedia({video: true})
           .then((mediaStream) => {
-            this.stream = mediaStream;
-            this.$refs.videoElement.srcObject = mediaStream;
-            this.streamingInterval = setInterval(this.sendFrame, 100);
-            this.$refs.videoPlaceholder.style.display = 'none';
+            that.stream = mediaStream;
+            that.$refs.videoElement.srcObject = mediaStream;
+            that.streamingInterval = setInterval(that.sendFrame, 100);
+            that.$refs.videoPlaceholder.style.display = 'none';
           })
           .catch((err) => {
             console.log("An error occurred: " + err);
@@ -134,14 +135,15 @@ export default {
       }
     },
     stopCamera() {
+      const that = this;
       if (this.stream) {
-        this.stream.getTracks().forEach(track => track.stop());
-        this.$refs.videoElement.srcObject = null;
-        this.stream = null;
-        clearInterval(this.streamingInterval);
-        const overlay = this.$refs.overlay;
+        that.stream.getTracks().forEach(track => track.stop());
+        that.$refs.videoElement.srcObject = null;
+        that.stream = null;
+        clearInterval(that.streamingInterval);
+        const overlay = that.$refs.overlay;
         overlay.getContext('2d').clearRect(0, 0, overlay.width, overlay.height);
-        this.$refs.videoPlaceholder.style.display = 'block';
+        that.$refs.videoPlaceholder.style.display = 'block';
       }
     },
     renameFace() {

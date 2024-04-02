@@ -1,12 +1,12 @@
 <template>
-    <XunfeiFaceCompare />
+    <FaceRecognition />
 </template>
 
 <script setup>
 import { useHead } from '@unhead/vue'
 
 useHead({
-  title: '人脸比对 | 讯飞API',
+  title: '实时人脸识别',
   meta: [
   ],
 })
