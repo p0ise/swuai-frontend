@@ -11,6 +11,7 @@
                     <v-list-item to="/face/compare" prepend-icon="mdi-compare" title="人脸比对" value="人脸比对"></v-list-item>
                     <v-list-item to="/face/features" prepend-icon="mdi-image-search" title="人脸特征分析"
                         value="人脸特征分析"></v-list-item>
+                    <v-list-item to="/face/recognition" prepend-icon="mdi-face-recognition" title="实时人脸识别" value="实时人脸识别"></v-list-item>
                 </v-list-group>
             </v-list>
         </v-navigation-drawer>
