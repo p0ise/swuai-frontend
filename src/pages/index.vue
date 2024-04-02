@@ -8,8 +8,8 @@
                     你可以上传图片进行人脸比对，或者分析人脸的年龄、性别、颜值和表情等特征。
                 </div>
                 <v-row justify="center" class="my-4">
-                    <v-btn to="/face/compare" color="primary" class="mr-2">尝试人脸比对</v-btn>
-                    <v-btn to="/face/features" color="secondary">开始人脸特征分析</v-btn>
+                    <v-btn to="/xunfei/FaceCompare" color="primary" class="mr-2">尝试人脸比对</v-btn>
+                    <v-btn to="/xunfei/FaceFeatures" color="secondary">开始人脸特征分析</v-btn>
                 </v-row>
             </v-col>
         </v-row>
@@ -17,11 +17,4 @@
 </template>
 
 <script>
-export default {
-  name: 'IndexView',
-};
 </script>
-
-<style scoped>
-/* 可以在这里添加一些样式来进一步美化页面 */
-</style>

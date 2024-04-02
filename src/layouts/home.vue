@@ -4,6 +4,7 @@
         <v-main>
             <router-view />
         </v-main>
+        <HomeFooter />
     </v-app>
 </template>
 
@@ -12,4 +13,5 @@ export default {
     data: () => ({
     }),
 }
+
 </script>
