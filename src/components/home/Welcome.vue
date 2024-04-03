@@ -14,7 +14,7 @@
             <!-- Features Cards -->
             <v-row id="features" justify="center" class="pa-2">
                 <v-col cols="auto" v-for="(feature, index) in features" :key="index" class="my-2 d-flex">
-                    <v-card class="mx-auto feature-card rounded-xl" elevation="2" style="max-width: 341px;">
+                    <v-card class="mx-auto feature-card rounded-xl" style="max-width: 341px;" hover>
                         <!-- Card Image -->
                         <v-img height="200px" :src="feature.image" style="width: 100%;" cover>
                         </v-img>

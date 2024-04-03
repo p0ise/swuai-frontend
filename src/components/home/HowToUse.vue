@@ -3,24 +3,11 @@
         <v-row>
             <v-col cols="12">
                 <h2 class="text-center text-h3" style="padding-bottom: 64px;">如何使用</h2>
-                <v-timeline>
-                    <v-timeline-item v-for="(step, index) in steps" :key="index" :color="step.color || 'primary'">
-                        <template v-slot:icon>
-                            <v-icon>{{ step.icon }}</v-icon>
-                        </template>
-                        <v-card>
-                            <v-card-title class="headline">{{ step.title }}</v-card-title>
-                            <v-card-text>{{ step.text }}</v-card-text>
-                            <v-card-actions>
-                                <v-btn v-if="step.buttonText" color="primary" :href="step.link" text>
-                                    {{ step.buttonText }}
-                                </v-btn>
-                            </v-card-actions>
-                            <v-img v-if="step.image" :src="step.image" class="white--text align-end"
-                                aspect-ratio="1.7"></v-img>
-                        </v-card>
-                    </v-timeline-item>
-                </v-timeline>
+                <v-stepper alt-labels :items="steps">
+                    <template v-for="(step, index) in steps" v-slot:item.index>
+                        <v-card :title="step.title" flat>{{step.text}}</v-card>
+                    </template>
+                </v-stepper>
             </v-col>
         </v-row>
     </v-container>
@@ -30,10 +17,11 @@
 export default {
     data() {
         return {
+            e1: 1,
             steps: [
                 {
-                    title: '注册账户',
-                    text: '输入你的个人信息以注册新账户。',
+                    title: '选择模块',
+                    text: '选择要使用的功能模块（人脸比对、特征分析或实时人脸识别）。',
                     icon: 'mdi-account-circle',
                     color: 'teal',
                     buttonText: '了解更多',

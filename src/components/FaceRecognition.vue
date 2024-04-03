@@ -16,8 +16,8 @@
       </div>
     </v-row>
 
-    <v-row>
-      <v-col class="d-flex justify-center">
+    <v-row class="justify-center">
+      <v-col class="d-flex justify-center" style="max-width: 675px;">
         <v-btn id="startCamera" @click="startCamera" color="primary" class="mx-2">开启摄像头</v-btn>
         <v-btn id="stopCamera" @click="stopCamera" color="error" class="mx-2">关闭摄像头</v-btn>
         <v-text-field v-model="selectedFaceIndex" label="输入人脸编号" variant="outlined" density="compact"
