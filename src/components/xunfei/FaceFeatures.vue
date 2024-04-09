@@ -50,7 +50,7 @@ export default {
             const formData = new FormData();
             formData.append('image', this.image);
             try {
-                const response = await axios.post('http://localhost:5000/api/face-features', formData, {
+                const response = await axios.post('http://localhost:5000/api/xunfei/face-features', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },
