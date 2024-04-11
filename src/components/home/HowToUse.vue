@@ -27,8 +27,8 @@ export default {
         return {
             steps: [
                 {
-                    title: '注册账户',
-                    text: '输入你的个人信息以注册新账户。',
+                    title: '选择模块',
+                    text: '选择要使用的功能模块。',
                     icon: 'mdi-account-circle',
                     color: 'teal',
                     buttonText: '了解更多',
