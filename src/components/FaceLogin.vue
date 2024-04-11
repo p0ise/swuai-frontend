@@ -1,29 +1,36 @@
 <template>
   <v-container class="login-container" fluid>
-    <div class="login-box d-flex justify-center">
-      <v-col class="justify-center" style="max-width: 400px;">
-        <h2>欢迎登录</h2>
-        <v-row justify="center mb-2">
-          <div id="videoCanvasWrapper" class="d-flex justify-center position-relative ma-0">
-            <video id="videoElement" ref="videoElement" autoplay playsinline height="300"></video>
-            <canvas id="overlay" ref="overlay" width="400" height="300"></canvas>
-            <v-overlay id="videoPlaceholder" :model-value="!stream" persistent contained>
-              点击“开始登录”开始人脸认证。
-            </v-overlay>
-          </div>
-        </v-row>
-        <v-row class="d-flex justify-center">
-          <v-btn color="primary" @click="startLogin" class="mx-2">开始登录</v-btn>
-          <v-btn color="error" @click="cancelLogin" class="mx-2">取消登录</v-btn>
-        </v-row>
-        <p class="text-login">没有账号？<router-link to="/Register">点击注册</router-link></p>
-
-        <v-snackbar v-model="snackbar" :color="snackbarColor">
-          {{ snackbarText }}
-          <v-btn color="white" text @click="snackbar = false">关闭</v-btn>
-        </v-snackbar>
-      </v-col>
-    </div>
+    <v-card class="login-box mx-auto">
+      <v-card-title class="text-center py-5 font-weight-black text-h5">欢迎登录</v-card-title>
+      <v-card-text class="text-center">
+        <div id="videoCanvasWrapper" class="d-flex justify-center position-relative ma-0 mb-7">
+          <video id="videoElement" ref="videoElement" autoplay playsinline width="400" height="300"></video>
+          <canvas id="overlay" ref="overlay" width="400" height="300"></canvas>
+          <v-overlay id="videoPlaceholder" :model-value="!stream" persistent contained>
+            摄像头未开启，请点击“摄像头开关”按钮。
+          </v-overlay>
+          <v-snackbar v-model="snackbar" :color="snackbarColor" variant="tonal" absolute attach="#videoCanvasWrapper"
+            location="top" :text="snackbarText" class="mx-1">
+            <template v-slot:actions>
+              <v-btn variant="text" text="关闭" @click="snackbar = false"></v-btn>
+            </template>
+          </v-snackbar>
+        </div>
+        <v-switch v-model="isCameraActive" color="primary" :label="`摄像头${isCameraActive ? '开启' : '关闭'}`"
+          @change="toggleCamera"></v-switch>
+        <v-btn block size="x-large" variant="flat" color="primary" @click="login">登录</v-btn>
+        <p class="text-login">没有账号？<router-link to="/register">点击注册</router-link></p>
+      </v-card-text>
+    </v-card>
+    <!-- Modal Dialog for registration response -->
+    <v-dialog v-model="dialog" persistent max-width="400px">
+      <v-card :color="dialogSuccess ? 'green lighten-4' : 'red lighten-4'" :text="dialogMessage" :title="dialogTitle">
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn class="ms-auto" text="关闭" @click="dialog = false"></v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -37,10 +44,18 @@ export default {
       videoElement: null,
       overlay: null,
       overlayCtx: null,
+      isCameraActive: false,
+      lastSentTimestamp: Date.now(),
       stream: null,
+      streamingInterval: null,
       snackbar: false,
       snackbarText: '',
       snackbarColor: 'success',
+      tranferScale: 0.5,
+      dialog: false,
+      dialogTitle: '',
+      dialogMessage: '',
+      dialogSuccess: false
     };
   },
   mounted() {
@@ -50,87 +65,113 @@ export default {
     this.overlayCtx = overlay.getContext('2d');
 
     this.socket.on('connect', () => {
-      console.log("Connected to Face Recogition");
+      console.log("Connected to Face Auth");
     });
 
-    // Listen for server responses
-    this.socket.on('login_response', (data) => {
-      this.snackbarText = data.message;
-      this.snackbarColor = data.success ? 'success' : 'error';
-      this.snackbar = true;
-      if (!data.success && data.message && data.message === "认证失败，未知人脸") {
-        // If the user is unknown, prompt them to register
-        this.snackbarText = "未知用户，请注册";
-        this.snackbarColor = 'info';
+    this.socket.on('detection_result', (data) => {
+      if (this.stream) {
+        // 清除之前的绘制
+        this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+        if (data.timestamp === this.lastSentTimestamp) {
+          if (data.success && data.face) {
+            // 清除之前的绘制
+            this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
+            const { location, landmark } = data.face;
+            const scaleWidth = this.overlay.width / this.videoElement.videoWidth / this.tranferScale;
+            const scaleHeight = this.overlay.height / this.videoElement.videoHeight / this.tranferScale;
+
+            let [top, right, bottom, left] = location;
+            // 调整人脸框位置和尺寸
+            left *= scaleWidth;
+            top *= scaleHeight;
+            right *= scaleWidth;
+            bottom *= scaleHeight;
+            let width = right - left;
+            let height = bottom - top;
+
+            this.overlayCtx.strokeStyle = 'red';
+            this.overlayCtx.lineWidth = 2;
+            this.overlayCtx.font = '14px Arial';
+
+            // 绘制人脸框
+            this.overlayCtx.strokeRect(left, top, width, height);
+
+            // 绘制关键点，考虑到缩放
+            this.overlayCtx.fillStyle = 'blue'; // 设置关键点的颜色
+            landmark.forEach(point => {
+              let [x, y] = point;
+              x *= scaleWidth;
+              y *= scaleHeight;
+              this.overlayCtx.beginPath();
+              this.overlayCtx.arc(x, y, 2, 0, 2 * Math.PI); // 绘制小圆点标记关键点位置
+              this.overlayCtx.fill();
+            });
+          } else if (data.message) {
+            this.snackbarText = data.message;
+            this.snackbarColor = 'warning';
+            this.snackbar = true;
+          }
+        } else {
+          console.debug('delay');
+          // 显示一个提示用户数据延迟的消息
+          // this.snackbarText = "数据可能已过时，请等待...";
+          // this.snackbarColor = 'info';
+          // this.snackbar = true;
+        }
       }
-      if (data.success || data.message === "认证失败，未知人脸") {
-        this.cancelLogin(); // Stop the camera on successful login or prompt to register
+    });
+
+
+    this.socket.on('login_response', (data) => {
+      this.dialog = true;
+      this.dialogSuccess = data.success;
+      if (data.success) {
+        clearInterval(this.streamingInterval);
+        this.videoElement.pause();
+        this.dialogTitle = "登录成功";
+        this.dialogMessage = data.message;
+      } else {
+        this.dialogTitle = "登录失败";
+        this.dialogMessage = data.message;
       }
     });
   },
   methods: {
+    toggleCamera() {
+      if (this.isCameraActive) {
+        this.startCamera();
+      } else {
+        this.stopCamera();
+      }
+    },
     sendFrame() {
       const currentTimestamp = Date.now();
       this.lastSentTimestamp = currentTimestamp;
+
+      const scaledWidth = this.videoElement.videoWidth * this.tranferScale;
+      const scaledHeight = this.videoElement.videoHeight * this.tranferScale;
+
       const canvas = document.createElement('canvas');
-      canvas.width = this.videoElement.videoWidth;
-      canvas.height = this.videoElement.videoHeight;
-      canvas.getContext('2d').drawImage(this.videoElement, 0, 0, canvas.width, canvas.height);
+      canvas.width = scaledWidth;
+      canvas.height = scaledHeight;
+
+      const context = canvas.getContext('2d');
+      context.drawImage(this.videoElement, 0, 0, scaledWidth, scaledHeight);
+
       const data = canvas.toDataURL('image/jpeg');
       if (data && data.length > 0 && !data.endsWith('data:,')) {
-        this.socket.emit('login', { image: data, timestamp: currentTimestamp });
+        this.socket.emit('frame', { image: data, username: this.name, timestamp: currentTimestamp });
       } else {
         console.error("Captured frame is empty or invalid.");
       }
     },
-    redraw() {
-      if (this.stream) {
-        // 清除之前的绘制
-        this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
-
-        // 重新绘制所有人脸框和关键点
-        this.lastDetectionResults.forEach(face => {
-          const { id, location, name, prob, landmark } = face;
-          const text = id ? name + "#" + id : name;
-          let [top, right, bottom, left] = location;
-          let width = right - left;
-          let height = bottom - top;
-
-          // 如果当前绘制的框是选中状态，使用特殊颜色或宽度高亮显示
-          if (this.selectedFace && id === this.selectedFace.id) {
-            this.overlayCtx.strokeStyle = 'yellow'; // 高亮颜色
-            this.overlayCtx.lineWidth = 4; // 增加边框宽度以高亮显示
-            this.overlayCtx.fillStyle = 'yellow';
-          } else {
-            this.overlayCtx.strokeStyle = 'red';
-            this.overlayCtx.lineWidth = 2;
-            this.overlayCtx.fillStyle = 'red';
-          }
-          this.overlayCtx.font = '14px Arial';
-
-          // 绘制人脸框
-          this.overlayCtx.strokeRect(left, top, width, height);
-          this.overlayCtx.fillText(text, left, top - 10);
-
-          // 绘制关键点
-          this.overlayCtx.fillStyle = 'blue'; // 关键点的颜色
-          landmark.forEach(point => {
-            // 根据人脸框的缩放调整关键点的位置
-            let [x, y] = point;
-            this.overlayCtx.beginPath();
-            this.overlayCtx.arc(x, y, 2, 0, 2 * Math.PI); // 绘制小圆点标记关键点位置
-            this.overlayCtx.fill();
-          });
-        });
-      }
-    },
-    startLogin() {
+    startCamera() {
       if (this.stream === null) {
         navigator.mediaDevices.getUserMedia({ video: true })
           .then(mediaStream => {
             this.stream = mediaStream;
             this.videoElement.srcObject = mediaStream;
-            this.videoElement.play();
+
             this.streamingInterval = setInterval(this.sendFrame, 100);
           })
           .catch(err => {
@@ -138,21 +179,44 @@ export default {
           });
       }
     },
-    cancelLogin() {
+    stopCamera() {
       if (this.stream) {
+        clearInterval(this.streamingInterval);
         this.stream.getTracks().forEach(track => track.stop());
         this.videoElement.srcObject = null;
         this.stream = null;
-        clearInterval(this.streamingInterval);
         this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
-        this.lastDetectionResults = null;
-        this.selectedFace = null;
+        this.snackbar = false;
+      }
+    },
+    login() {
+      if (this.stream) {
+        const canvas = document.createElement('canvas');
+        canvas.width = this.videoElement.videoWidth;
+        canvas.height = this.videoElement.videoHeight;
+        canvas.getContext('2d').drawImage(this.videoElement, 0, 0, canvas.width, canvas.height);
+        const data = canvas.toDataURL('image/jpeg');
+        if (data && data.length > 0 && !data.endsWith('data:,')) {
+          this.socket.emit('login', { image: data });
+        } else {
+          console.error("Captured frame is empty or invalid.");
+        }
+      } else {
+        this.dialog = true;
+        this.dialogSuccess = false;
+        this.dialogTitle = "登录失败";
+        this.dialogMessage = "请先开启摄像头！";
       }
     },
   },
+  watch: {
+    isCameraActive(newVal) {
+      this.toggleCamera();
+    }
+  },
   beforeUnmount() {
     // 清理工作
-    this.cancelLogin();
+    this.stopCamera();
     if (this.socket) {
       this.socket.disconnect();
     }
@@ -170,26 +234,19 @@ export default {
 }
 
 .login-box {
-  padding: 35px;
-  background: white;
+  padding: 30px 50px;
   border-radius: 10px;
   box-shadow: 0 15px 25px rgba(0, 0, 0, 0.5);
-  width: 100%;
-  max-width: 550px;
-}
-
-h2 {
-  color: #333;
-  margin-bottom: 40px;
-  text-align: center;
 }
 
 #videoCanvasWrapper {
   position: relative;
   width: 400px;
   height: 300px;
-  background-color: #93A5B1;
-  border: 5px solid #C0C0C0;
+  background-color: #000;
+  border: 4px solid #5A5A5A;
+  border-radius: 8px;
+  overflow: hidden;
 }
 
 #videoElement,
@@ -199,6 +256,7 @@ h2 {
   height: 100%;
   top: 0;
   left: 0;
+  object-fit: cover;
 }
 
 #videoPlaceholder {
@@ -206,6 +264,9 @@ h2 {
   justify-content: center;
   align-items: center;
   color: #fff;
+  background-color: rgba(0, 0, 0, 0.7);
+  font-size: 16px;
+  text-align: center;
 }
 
 .text-login {
