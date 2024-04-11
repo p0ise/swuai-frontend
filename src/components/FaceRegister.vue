@@ -1,5 +1,5 @@
 <template>
-  <v-container class="login-container">
+  <v-container class="login-container" fluid>
     <div class="login-box d-flex justify-center">
       <v-col class="justify-center" style="max-width: 400px;">
         <h2>欢迎注册</h2>
