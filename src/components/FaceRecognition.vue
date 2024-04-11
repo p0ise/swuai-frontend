@@ -1,32 +1,34 @@
 <template>
-  <v-container class="text-center pa-0">
-    <v-row justify="center">
-      <v-col cols="12">
-        <h1 class="text-h4 py-4">实时人脸检测与标注</h1>
-      </v-col>
-    </v-row>
+  <div class="background-image">
+    <v-container class="text-center pa-0">
+      <v-row justify="center">
+        <v-col cols="12">
+          <h1 class="text-h4 py-4">实时人脸检测与标注</h1>
+        </v-col>
+      </v-row>
 
-    <v-row justify="center">
-      <div id="videoCanvasWrapper" class="d-flex justify-center position-relative ma-0">
-        <video id="videoElement" ref="videoElement" autoplay playsinline width="640" height="480"></video>
-        <canvas id="overlay" ref="overlay" width="640" height="480"></canvas>
-        <v-overlay id="videoPlaceholder" :model-value="!stream" persistent contained>
-          摄像头未开启，请点击“开启摄像头”按钮。
-        </v-overlay>
-      </div>
-    </v-row>
+      <v-row justify="center">
+        <div id="videoCanvasWrapper" class="d-flex justify-center position-relative ma-0">
+          <video id="videoElement" ref="videoElement" autoplay playsinline width="640" height="480"></video>
+          <canvas id="overlay" ref="overlay" width="640" height="480"></canvas>
+          <v-overlay id="videoPlaceholder" :model-value="!stream" persistent contained>
+            摄像头未开启，请点击“开启摄像头”按钮。
+          </v-overlay>
+        </div>
+      </v-row>
 
-    <v-row>
-      <v-col class="d-flex justify-center">
-        <v-btn id="startCamera" @click="startCamera" color="primary" class="mx-2">开启摄像头</v-btn>
-        <v-btn id="stopCamera" @click="stopCamera" color="error" class="mx-2">关闭摄像头</v-btn>
-        <v-text-field v-model="selectedFaceIndex" label="输入人脸编号" variant="outlined" density="compact"
-          class="mx-2"></v-text-field>
-        <v-text-field v-model="newName" label="输入新名称" variant="outlined" density="compact" class="mx-2"></v-text-field>
-        <v-btn id="renameBtn" @click="renameFace" color="secondary" class="mx-2">重命名</v-btn>
-      </v-col>
-    </v-row>
-  </v-container>
+      <v-row class="justify-center">
+        <v-col class="d-flex justify-center" style="max-width: 760px;">
+          <v-btn id="startCamera" @click="startCamera" color="#ADD8E6" class="mx-2">开启摄像头</v-btn>
+          <v-btn id="stopCamera" @click="stopCamera" color="error" class="mx-2">关闭摄像头</v-btn>
+          <v-text-field v-model="selectedFaceIndex" label="输入人脸编号" variant="outlined" density="compact"
+            class="mx-2" style="max-width: 130px;"></v-text-field>
+          <v-text-field v-model="newName" label="输入新名称" variant="outlined" density="compact" class="mx-2"></v-text-field>
+          <v-btn id="renameBtn" @click="renameFace" color="secondary" class="mx-2">重命名</v-btn>
+        </v-col>
+      </v-row>
+    </v-container>
+  </div>
 </template>
 
 <script>
@@ -203,11 +205,24 @@ export default {
 </script>
 
 <style scoped>
+@font-face {
+  font-family: 'HomoLight'; /* 自定义字体名称 */
+  src: url('@/assets/fonts/HomoLight.ttf') format('truetype'); /* 字体文件的路径和格式 */
+}
+
+h1 {
+  font-family: 'HomoLight', sans-serif; /* 使用Poppins字体 */
+  font-size: 2.5rem; /* 根据需要调整大小 */
+  color: #F0F0F0; /* 深蓝色字体 */
+  text-shadow: 1px 1px 2px #00000050; /* 添加淡黑色阴影以增强对比 */
+}
+
 #videoCanvasWrapper {
   position: relative;
   width: 640px;
   height: 480px;
-  background-color: #000;
+  background-color: #93A5B1;
+  border: 5px solid #C0C0C0;
 }
 
 #videoElement,
@@ -224,5 +239,15 @@ export default {
   justify-content: center;
   align-items: center;
   color: #fff;
+}
+
+.background-image {
+    padding: 85px 24px 80px;
+    gap: 104px;
+    background-image: url('@/assets/img/hero-background.svg');
+    background-size: cover;
+    background-position: center;
+    min-height: 91vh;
+    color: #fff;
 }
 </style>

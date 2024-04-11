@@ -31,6 +31,21 @@
             <!-- 实时人脸识别 -->
             <v-btn text to="/RTFaceRecognition">实时人脸识别</v-btn>
 
+            <div class="v-toolbar__append">
+              <hr class="v-divider v-divider--vertical v-theme--light mx-4 align-self-center h-100" aria-orientation="vertical" role="separator" style="max-height: 25px;">
+            </div>
+
+            <button type="button" class="v-btn v-btn--active v-theme--light bg-primary v-btn--density-default v-btn--size-default v-btn--variant-flat text-none font-weight-regular vo-auth-btn" aria-haspopup="menu" aria-expanded="false" aria-owns="v-menu-48" style="transition: all 0.2s ease 0s;" @click="this.$router.push('/Login')">
+              <span class="v-btn__overlay"></span>
+              <span class="v-btn__underlay"></span>
+              <!---->
+              <span class="v-btn__content" data-no-activator="">
+                <span >登录</span>
+                <!---->
+              </span>
+              <!---->
+              <!---->
+            </button>
 
         </v-container>
     </v-app-bar>

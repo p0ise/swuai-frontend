@@ -1,4 +1,5 @@
 <template>
+
     <v-container>
         <v-row justify="center">
             <v-col cols="12" md="8" lg="6">
@@ -110,5 +111,14 @@ export default {
 
 .info-box ul {
     padding-left: 20px;
+}
+.background-image {
+    padding: 128px 24px 80px;
+    gap: 104px;
+    background-image: url('@/assets/img/hero-background.svg');
+    background-size: cover;
+    background-position: center;
+    min-height: 60vh;
+    color: #fff;
 }
 </style>
