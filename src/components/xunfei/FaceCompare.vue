@@ -70,7 +70,7 @@ export default {
             formData.append('image2', this.image2);
 
             try {
-                const response = await axios.post('http://localhost:5000/api/face-compare', formData, {
+                const response = await axios.post('http://localhost:5000/api/xunfei/face-compare', formData, {
                     headers: {
                         'Content-Type': 'multipart/form-data',
                     },

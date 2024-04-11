@@ -1,34 +1,32 @@
 <template>
-  <div class="background-image">
-    <v-container class="text-center pa-0">
-      <v-row justify="center">
-        <v-col cols="12">
-          <h1 class="text-h4 py-4">实时人脸检测与标注</h1>
-        </v-col>
-      </v-row>
+  <v-container class="text-center pa-0">
+    <v-row justify="center">
+      <v-col cols="12">
+        <h1 class="text-h4 py-4">实时人脸检测与标注</h1>
+      </v-col>
+    </v-row>
 
-      <v-row justify="center">
-        <div id="videoCanvasWrapper" class="d-flex justify-center position-relative ma-0">
-          <video id="videoElement" ref="videoElement" autoplay playsinline width="640" height="480"></video>
-          <canvas id="overlay" ref="overlay" width="640" height="480"></canvas>
-          <v-overlay id="videoPlaceholder" :model-value="!stream" persistent contained>
-            摄像头未开启，请点击“开启摄像头”按钮。
-          </v-overlay>
-        </div>
-      </v-row>
+    <v-row justify="center">
+      <div id="videoCanvasWrapper" class="d-flex justify-center position-relative ma-0">
+        <video id="videoElement" ref="videoElement" autoplay playsinline width="640" height="480"></video>
+        <canvas id="overlay" ref="overlay" width="640" height="480"></canvas>
+        <v-overlay id="videoPlaceholder" :model-value="!stream" persistent contained>
+          摄像头未开启，请点击“开启摄像头”按钮。
+        </v-overlay>
+      </div>
+    </v-row>
 
-      <v-row class="justify-center">
-        <v-col class="d-flex justify-center" style="max-width: 760px;">
-          <v-btn id="startCamera" @click="startCamera" color="#ADD8E6" class="mx-2">开启摄像头</v-btn>
-          <v-btn id="stopCamera" @click="stopCamera" color="error" class="mx-2">关闭摄像头</v-btn>
-          <v-text-field v-model="selectedFaceIndex" label="输入人脸编号" variant="outlined" density="compact"
-            class="mx-2" style="max-width: 130px;"></v-text-field>
-          <v-text-field v-model="newName" label="输入新名称" variant="outlined" density="compact" class="mx-2"></v-text-field>
-          <v-btn id="renameBtn" @click="renameFace" color="secondary" class="mx-2">重命名</v-btn>
-        </v-col>
-      </v-row>
-    </v-container>
-  </div>
+    <v-row class="justify-center">
+      <v-col class="d-flex justify-center" style="max-width: 675px;">
+        <v-btn id="startCamera" @click="startCamera" color="primary" class="mx-2">开启摄像头</v-btn>
+        <v-btn id="stopCamera" @click="stopCamera" color="error" class="mx-2">关闭摄像头</v-btn>
+        <v-text-field v-model="selectedFaceId" label="输入人脸编号" variant="outlined" density="compact"
+          class="mx-2"></v-text-field>
+        <v-text-field v-model="newName" label="输入新名称" variant="outlined" density="compact" class="mx-2"></v-text-field>
+        <v-btn id="renameBtn" @click="renameFace" color="secondary" class="mx-2">重命名</v-btn>
+      </v-col>
+    </v-row>
+  </v-container>
 </template>
 
 <script>
@@ -46,18 +44,18 @@ export default {
       streamingInterval: null,
       lastDetectionResults: [],
       selectedFace: null,
-      selectedFaceIndex: '',
+      selectedFaceId: '',
       newName: ''
     };
   },
   mounted() {
-    this.socket = io('http://localhost:5000/api/face-recognition');
+    this.socket = io('ws://localhost:5000/api/face-recognition');
     this.videoElement = this.$refs.videoElement;
     this.overlay = this.$refs.overlay;
     this.overlayCtx = overlay.getContext('2d');
 
     this.socket.on('connect', () => {
-      console.log("Connected");
+      console.log("Connected to Face Recogition");
     });
 
     this.socket.on('detection_results', (data) => {
@@ -96,16 +94,16 @@ export default {
         // 清除之前的绘制
         this.overlayCtx.clearRect(0, 0, this.overlay.width, this.overlay.height);
 
-        // 重新绘制所有人脸框
+        // 重新绘制所有人脸框和关键点
         this.lastDetectionResults.forEach(face => {
-          const { index, location, name } = face;
-          const text = name + "#" + index;
+          const { id, location, name, prob, landmark } = face;
+          const text = id ? name + "#" + id : name;
           let [top, right, bottom, left] = location;
           let width = right - left;
           let height = bottom - top;
 
           // 如果当前绘制的框是选中状态，使用特殊颜色或宽度高亮显示
-          if (this.selectedFace && index === this.selectedFace.index) {
+          if (this.selectedFace && id === this.selectedFace.id) {
             this.overlayCtx.strokeStyle = 'yellow'; // 高亮颜色
             this.overlayCtx.lineWidth = 4; // 增加边框宽度以高亮显示
             this.overlayCtx.fillStyle = 'yellow';
@@ -116,12 +114,19 @@ export default {
           }
           this.overlayCtx.font = '14px Arial';
 
+          // 绘制人脸框
           this.overlayCtx.strokeRect(left, top, width, height);
           this.overlayCtx.fillText(text, left, top - 10);
 
-          // 重置为默认状态以供下一个框使用
-          this.overlayCtx.strokeStyle = 'red';
-          this.overlayCtx.lineWidth = 2;
+          // 绘制关键点
+          this.overlayCtx.fillStyle = 'blue'; // 关键点的颜色
+          landmark.forEach(point => {
+            // 根据人脸框的缩放调整关键点的位置
+            let [x, y] = point;
+            this.overlayCtx.beginPath();
+            this.overlayCtx.arc(x, y, 2, 0, 2 * Math.PI); // 绘制小圆点标记关键点位置
+            this.overlayCtx.fill();
+          });
         });
       }
     },
@@ -151,19 +156,12 @@ export default {
       }
     },
     renameFace() {
-      const faceIndexStr = this.selectedFaceIndex;
+      const faceId = this.selectedFaceId;
       const newName = this.newName;
       // 明确检查faceIndexStr是否不是null或undefined
-      if (faceIndexStr !== null && faceIndexStr !== undefined && newName) {
-        // 将faceIndex字符串转换为整数
-        const faceIndex = parseInt(faceIndexStr, 10);
-        // 确保转换成功，parseInt会在转换失败时返回NaN
-        if (!isNaN(faceIndex)) {
-          const data = { index: faceIndex, name: newName };
-          this.socket.emit('rename_face', data); // 发送索引和新名称到后端
-        } else {
-          console.error("Face index is not a valid number.");
-        }
+      if (faceId) {
+        const data = { id: faceId, name: newName };
+        this.socket.emit('rename_face', data); // 发送索引和新名称到后端
       } else {
         console.error("Face index or new name is not provided.");
       }
@@ -184,7 +182,7 @@ export default {
 
         if (clickedFace) {
           // Update the selected face in the component's data
-          this.selectedFaceIndex = clickedFace.index;
+          this.selectedFaceId = clickedFace.id;
           this.selectedFace = clickedFace;
         } else {
           this.selectedFace = null;
@@ -205,24 +203,11 @@ export default {
 </script>
 
 <style scoped>
-@font-face {
-  font-family: 'HomoLight'; /* 自定义字体名称 */
-  src: url('@/assets/fonts/HomoLight.ttf') format('truetype'); /* 字体文件的路径和格式 */
-}
-
-h1 {
-  font-family: 'HomoLight', sans-serif; /* 使用Poppins字体 */
-  font-size: 2.5rem; /* 根据需要调整大小 */
-  color: #F0F0F0; /* 深蓝色字体 */
-  text-shadow: 1px 1px 2px #00000050; /* 添加淡黑色阴影以增强对比 */
-}
-
 #videoCanvasWrapper {
   position: relative;
   width: 640px;
   height: 480px;
-  background-color: #93A5B1;
-  border: 5px solid #C0C0C0;
+  background-color: #000;
 }
 
 #videoElement,
@@ -239,15 +224,5 @@ h1 {
   justify-content: center;
   align-items: center;
   color: #fff;
-}
-
-.background-image {
-    padding: 85px 24px 80px;
-    gap: 104px;
-    background-image: url('@/assets/img/hero-background.svg');
-    background-size: cover;
-    background-position: center;
-    min-height: 91vh;
-    color: #fff;
 }
 </style>
