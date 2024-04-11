@@ -3,24 +3,19 @@
         <v-row>
             <v-col cols="12">
                 <h2 class="text-center text-h3" style="padding-bottom: 64px;">如何使用</h2>
-                <v-timeline>
-                    <v-timeline-item v-for="(step, index) in steps" :key="index" :color="step.color || 'primary'">
-                        <template v-slot:icon>
-                            <v-icon>{{ step.icon }}</v-icon>
-                        </template>
-                        <v-card>
-                            <v-card-title class="headline">{{ step.title }}</v-card-title>
-                            <v-card-text>{{ step.text }}</v-card-text>
-                            <v-card-actions>
-                                <v-btn v-if="step.buttonText" color="primary" :href="step.link" text>
-                                    {{ step.buttonText }}
-                                </v-btn>
-                            </v-card-actions>
-                            <v-img v-if="step.image" :src="step.image" class="white--text align-end"
-                                aspect-ratio="1.7"></v-img>
-                        </v-card>
-                    </v-timeline-item>
-                </v-timeline>
+                  <v-stepper :items="['Step 1', 'Step 2', 'Step 3']">
+                    <template v-slot:item.1>
+                      <v-card title="Step One" flat>...</v-card>
+                    </template>
+
+                    <template v-slot:item.2>
+                      <v-card title="Step Two" flat>...</v-card>
+                    </template>
+
+                    <template v-slot:item.3>
+                      <v-card title="Step Three" flat>...</v-card>
+                    </template>
+                  </v-stepper>
             </v-col>
         </v-row>
     </v-container>

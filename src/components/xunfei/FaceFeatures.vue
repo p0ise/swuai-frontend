@@ -130,5 +130,14 @@ export default {
 </script>
 
 <style scoped>
+.background-image {
+    padding: 128px 24px 80px;
+    gap: 104px;
+    background-image: url('@/assets/img/hero-background.svg');
+    background-size: cover;
+    background-position: center;
+    min-height: 60vh;
+    color: #fff;
+}
 /* 适当调整样式以适应新的布局 */
 </style>
