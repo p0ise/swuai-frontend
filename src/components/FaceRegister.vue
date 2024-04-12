@@ -10,7 +10,7 @@
             摄像头未开启，请点击“摄像头开关”按钮。
           </v-overlay>
           <v-snackbar v-model="snackbar" :color="snackbarColor" variant="tonal" absolute attach="#videoCanvasWrapper"
-            location="top" :text="snackbarText" class="mx-1">
+            location="top" timeout="500" :text="snackbarText" class="mx-1">
             <template v-slot:actions>
               <v-btn variant="text" text="关闭" @click="snackbar = false"></v-btn>
             </template>
@@ -19,7 +19,7 @@
         <v-text-field v-model="name" label="请输入用户名" variant="outlined" single-line></v-text-field>
         <v-switch v-model="isCameraActive" color="primary" :label="`摄像头${isCameraActive ? '开启' : '关闭'}`"
           @change="toggleCamera"></v-switch>
-        <v-btn block size="x-large" variant="flat" color="primary" @click="register">注册</v-btn>
+        <v-btn :disabled="loading" :loading="loading" block size="x-large" variant="flat" color="primary" @click="register">注册</v-btn>
         <p class="text-register">已有账号？<router-link to="/login">点击登录</router-link></p>
       </v-card-text>
     </v-card>
@@ -57,7 +57,8 @@ export default {
       dialog: false,
       dialogTitle: '',
       dialogMessage: '',
-      dialogSuccess: false
+      dialogSuccess: false,
+      loading: false
     };
   },
   mounted() {
@@ -125,6 +126,7 @@ export default {
 
 
     this.socket.on('register_response', (data) => {
+      this.loading = false;
       this.dialog = true;
       this.dialogSuccess = data.success;
       if (data.success) {
@@ -193,6 +195,7 @@ export default {
     },
     register() {
       if (this.stream) {
+        this.loading = true;
         const canvas = document.createElement('canvas');
         canvas.width = this.videoElement.videoWidth;
         canvas.height = this.videoElement.videoHeight;
