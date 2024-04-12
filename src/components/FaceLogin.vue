@@ -174,7 +174,9 @@ export default {
           .then(mediaStream => {
             this.stream = mediaStream;
             this.videoElement.srcObject = mediaStream;
-
+            if (this.streamingInterval) {
+              clearInterval(this.streamingInterval);
+            }
             this.streamingInterval = setInterval(this.sendFrame, 100);
           })
           .catch(err => {
@@ -194,13 +196,13 @@ export default {
     },
     login() {
       if (this.stream) {
-        this.loading = true;
         const canvas = document.createElement('canvas');
         canvas.width = this.videoElement.videoWidth;
         canvas.height = this.videoElement.videoHeight;
         canvas.getContext('2d').drawImage(this.videoElement, 0, 0, canvas.width, canvas.height);
         const data = canvas.toDataURL('image/jpeg');
         if (data && data.length > 0 && !data.endsWith('data:,')) {
+          this.loading = true;
           this.socket.emit('login', { image: data });
         } else {
           console.error("Captured frame is empty or invalid.");

@@ -171,11 +171,14 @@ export default {
     },
     startCamera() {
       if (this.stream === null) {
+        console.debug("startCamera");
         navigator.mediaDevices.getUserMedia({ video: true })
           .then(mediaStream => {
             this.stream = mediaStream;
             this.videoElement.srcObject = mediaStream;
-
+            if (this.streamingInterval) {
+              clearInterval(this.streamingInterval);
+            }
             this.streamingInterval = setInterval(this.sendFrame, 100);
           })
           .catch(err => {
@@ -195,7 +198,6 @@ export default {
     },
     register() {
       if (this.stream) {
-        this.loading = true;
         const canvas = document.createElement('canvas');
         canvas.width = this.videoElement.videoWidth;
         canvas.height = this.videoElement.videoHeight;
@@ -203,6 +205,7 @@ export default {
         const data = canvas.toDataURL('image/jpeg');
         if (data && data.length > 0 && !data.endsWith('data:,')) {
           if (this.name) {
+            this.loading = true;
             this.socket.emit('register', { image: data, username: this.name });
           } else {
             this.dialog = true;
@@ -224,6 +227,9 @@ export default {
   watch: {
     isCameraActive(newVal) {
       this.toggleCamera();
+    },
+    streamingInterval(newVal) {
+      console.debug("streamingInterval change");
     }
   },
   beforeUnmount() {
