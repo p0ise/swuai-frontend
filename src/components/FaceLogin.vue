@@ -2,7 +2,7 @@
   <v-container class="login-container" fluid>
     <v-card class="login-box mx-auto">
       <v-card-title class="text-center py-5 font-weight-black text-h5">欢迎登录</v-card-title>
-      <v-card-text class="text-center">
+      <v-card-text>
         <div id="videoCanvasWrapper" class="d-flex justify-center position-relative ma-0 mb-7">
           <video id="videoElement" ref="videoElement" autoplay playsinline width="400" height="300"></video>
           <canvas id="overlay" ref="overlay" width="400" height="300"></canvas>
@@ -235,7 +235,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: calc(100vh - 64px);
   background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
 }
 

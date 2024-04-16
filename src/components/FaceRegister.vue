@@ -2,7 +2,7 @@
   <v-container class="login-container" fluid>
     <v-card class="login-box mx-auto">
       <v-card-title class="text-center py-5 font-weight-black text-h5">欢迎注册</v-card-title>
-      <v-card-text class="text-center">
+      <v-card-text>
         <div id="videoCanvasWrapper" class="d-flex justify-center position-relative ma-0 mb-7">
           <video id="videoElement" ref="videoElement" autoplay playsinline width="400" height="300"></video>
           <canvas id="overlay" ref="overlay" width="400" height="300"></canvas>
@@ -16,7 +16,7 @@
             </template>
           </v-snackbar>
         </div>
-        <v-text-field v-model="name" label="请输入用户名" variant="outlined" single-line></v-text-field>
+        <v-text-field v-model="name" label="请输入用户名" :rules="[rules.required]" variant="outlined" single-line></v-text-field>
         <v-switch v-model="isCameraActive" color="primary" :label="`摄像头${isCameraActive ? '开启' : '关闭'}`"
           @change="toggleCamera"></v-switch>
         <v-btn :disabled="loading" :loading="loading" block size="x-large" variant="flat" color="primary" @click="register">注册</v-btn>
@@ -53,6 +53,9 @@ export default {
       snackbarText: '',
       snackbarColor: 'success',
       name: '',
+      rules: {
+        required: value => !!value || "必填"
+      },
       tranferScale: 0.5,
       dialog: false,
       dialogTitle: '',
@@ -247,7 +250,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  height: calc(100vh - 64px);
   background: linear-gradient(to right, #6a11cb 0%, #2575fc 100%);
 }
 
