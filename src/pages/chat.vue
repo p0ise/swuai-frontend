@@ -32,8 +32,8 @@
                         </template>
                     </v-list-item>
                 </v-list>
-                <v-expansion-panels style="flex-direction: column;" color="#f9f9f9">
-                    <v-expansion-panel rounded="rounded-pill">
+                <v-expansion-panels style="flex-direction: column;">
+                    <v-expansion-panel rounded="rounded-pill" bg-color="#f9f9f9">
                         <v-expansion-panel-title expand-icon="mdi-plus" collapse-icon="mdi-close">
                             <v-icon icon="mdi-cog" class="mr-4"></v-icon> 配置
                         </v-expansion-panel-title>
