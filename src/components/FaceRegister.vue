@@ -16,10 +16,12 @@
             </template>
           </v-snackbar>
         </div>
-        <v-text-field v-model="name" label="请输入用户名" :rules="[rules.required]" variant="outlined" single-line></v-text-field>
+        <v-text-field v-model="name" label="请输入用户名" :rules="[rules.required]" variant="outlined"
+          single-line></v-text-field>
         <v-switch v-model="isCameraActive" color="primary" :label="`摄像头${isCameraActive ? '开启' : '关闭'}`"
           @change="toggleCamera"></v-switch>
-        <v-btn :disabled="loading" :loading="loading" block size="x-large" variant="flat" color="primary" @click="register">注册</v-btn>
+        <v-btn :disabled="loading" :loading="loading" block size="x-large" variant="flat" color="primary"
+          @click="register">注册</v-btn>
         <p class="text-register">已有账号？<router-link to="/login">点击登录</router-link></p>
       </v-card-text>
     </v-card>
@@ -37,6 +39,7 @@
 
 <script>
 import io from 'socket.io-client';
+import { useUserStore } from '@/stores/userStore';
 
 export default {
   data() {
@@ -64,7 +67,22 @@ export default {
       loading: false
     };
   },
+  computed: {
+    isLoggedIn() {
+      const userStore = useUserStore();
+      return userStore.isLoggedIn;
+    },
+  },
   mounted() {
+    if (this.isLoggedIn) {
+      this.dialog = true;
+      this.dialogSuccess = true;
+      this.dialogTitle = "已登录";
+      this.dialogMessage = "您已登录，3s后自动为您跳转到到聊天页面...";
+      setTimeout(() => {
+        this.$router.replace({ name: '/chat' }); // Assuming 'Chat' is the route name for your chat page
+      }, 3000); // Wait for 3 seconds before redirecting
+    }
     this.socket = io('ws://localhost:5000/api/face-auth');
     this.videoElement = this.$refs.videoElement;
     this.overlay = this.$refs.overlay;
@@ -136,7 +154,18 @@ export default {
         clearInterval(this.streamingInterval);
         this.videoElement.pause();
         this.dialogTitle = "注册成功";
-        this.dialogMessage = data.message || `欢迎, ${this.name}!`;
+        const userStore = useUserStore();
+        const username = data.message;
+        const message = "注册成功，欢迎 " + username + "！3s后自动为您跳转到聊天页面...";
+        try {
+          userStore.login(username);
+          this.dialogMessage = message;
+          setTimeout(() => {
+            this.$router.replace({ name: '/chat' }); // Assuming 'Chat' is the route name for your chat page
+          }, 3000); // Wait for 3 seconds before redirecting
+        } catch (error) {
+          alert(error.message);
+        }
       } else {
         this.dialogTitle = "注册失败";
         this.dialogMessage = data.message || "无法注册，请重试。";
