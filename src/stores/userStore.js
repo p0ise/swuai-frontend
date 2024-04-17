@@ -6,7 +6,8 @@ export const useUserStore = defineStore('userStore', {
     user: JSON.parse(localStorage.getItem('user')) || null
   }),
   getters: {
-    isLoggedIn: (state) => !!state.user
+    isLoggedIn: (state) => !!state.user,
+    currentUser: (state) => state.user
   },
   actions: {
     login(user) {
