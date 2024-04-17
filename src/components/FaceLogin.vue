@@ -37,6 +37,7 @@
 
 <script>
 import io from 'socket.io-client';
+import { useUserStore } from '@/stores/userStore';
 
 export default {
   data() {
@@ -60,7 +61,22 @@ export default {
       loading: false
     };
   },
+  computed: {
+    isLoggedIn() {
+      const userStore = useUserStore();
+      return userStore.isLoggedIn;
+    },
+  },
   mounted() {
+    if (this.isLoggedIn) {
+      this.dialog = true;
+      this.dialogSuccess = true;
+      this.dialogTitle = "已登录";
+      this.dialogMessage = "您已登录，3s后自动为您跳转到到聊天页面...";
+      setTimeout(() => {
+        this.$router.replace({ name: '/chat' }); // Assuming 'Chat' is the route name for your chat page
+      }, 3000); // Wait for 3 seconds before redirecting
+    }
     this.socket = io('ws://localhost:5000/api/face-auth');
     this.videoElement = this.$refs.videoElement;
     this.overlay = this.$refs.overlay;
@@ -132,7 +148,18 @@ export default {
         clearInterval(this.streamingInterval);
         this.videoElement.pause();
         this.dialogTitle = "登录成功";
-        this.dialogMessage = data.message;
+        const userStore = useUserStore();
+        const username = data.message;
+        const message = "认证成功，欢迎 " + username + " 登录！3s后自动为您跳转到聊天页面...";
+        try {
+          userStore.login(username);
+          this.dialogMessage = message;
+          setTimeout(() => {
+            this.$router.replace({ name: '/chat' }); // Assuming 'Chat' is the route name for your chat page
+          }, 3000); // Wait for 3 seconds before redirecting
+        } catch (error) {
+          alert(error.message);
+        }
       } else {
         this.dialogTitle = "登录失败";
         this.dialogMessage = data.message;
