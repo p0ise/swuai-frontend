@@ -94,7 +94,7 @@
             <ChatWelcome v-if="!currentConversation || currentConversation.root.children.length === 0" />
             <ChatConversation v-else :conversation="currentConversation" @prompt="prompt" />
             <v-footer app>
-                <v-row>
+                <v-col cols="12" md="10" offset-md="1">
                     <v-textarea v-model="newMessage" label="输入您的消息..." density="compact" variant="outlined" single-line
                         auto-grow rows="1" clearable clear-icon="mdi-close-circle-outline"
                         @keydown.enter.exact="enterOnly">
@@ -106,10 +106,9 @@
                                     </v-btn>
                                 </template>
                             </v-tooltip>
-
                         </template>
                     </v-textarea>
-                </v-row>
+                </v-col>
             </v-footer>
         </v-main>
     </v-app>

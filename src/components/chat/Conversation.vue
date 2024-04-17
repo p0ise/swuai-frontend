@@ -1,10 +1,13 @@
 <template>
     <v-container class="chat-window">
-        <v-list>
-            <v-list-item v-for="(node, index) in getCurrentPath()" :key="index">
-                <ChatMessage :message="node" @prompt="prompt" @edit="edit" @remove="remove" @navigateTo="navigateTo" />
-            </v-list-item>
-        </v-list>
+        <v-col cols="12" md="10" offset-md="1">
+            <v-list>
+                <v-list-item v-for="(node, index) in getCurrentPath()" :key="index">
+                    <ChatMessage :message="node" @prompt="prompt" @edit="edit" @remove="remove"
+                        @navigateTo="navigateTo" />
+                </v-list-item>
+            </v-list>
+        </v-col>
     </v-container>
 </template>
 
@@ -41,5 +44,4 @@ const navigateTo = (node) => {
 }
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>
