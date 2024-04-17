@@ -6,7 +6,7 @@
 import { useHead } from '@unhead/vue'
 
 useHead({
-  titleTemplate: title => title ? `${title} - SWU X FACE` : 'SWU X FACE',
+  titleTemplate: title => title ? `${title} - SWU X AI` : 'SWU X AI',
   meta: [
   ],
 })
