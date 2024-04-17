@@ -4,8 +4,8 @@
         <v-row justify="center" align="center" class="hero-background">
 
             <v-col cols="12" class="welcome-text text-center">
-                <h1 class="text-h3 mb-4">欢迎使用 SWU X FACE</h1>
-                <p class="mb-6">领先的人脸识别技术，保障您的安全与便捷</p>
+                <h1 class="text-h3 mb-4">欢迎使用 SWU X AI</h1>
+                <p class="mb-6">领先的人工智能技术，保障您的安全与便捷</p>
                 <v-btn large class="mb-6 rounded-pill" href="#features" color="white">
                     了解更多
                 </v-btn>

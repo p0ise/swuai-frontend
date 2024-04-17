@@ -3,7 +3,7 @@
         <v-container class="mx-auto d-flex align-center justify-center">
 
             <v-app-bar-title class="d-flex align-center font-weight-bold">
-                SWU X FACE
+                SWU X AI
             </v-app-bar-title>
 
             <!-- 空间分隔 -->
@@ -31,11 +31,9 @@
             <!-- 实时人脸识别 -->
             <v-btn to="/RTFaceRecognition">实时人脸识别</v-btn>
 
-            <div class="v-toolbar__append">
-              <hr class="v-divider v-divider--vertical v-theme--light mx-4 align-self-center h-100" aria-orientation="vertical" role="separator" style="max-height: 25px;">
-            </div>
+            <v-divider vertical class="mx-4 my-auto" style="height: 20px;" inset></v-divider>
 
-            <v-btn to="/login" color="primary" variant="flat">登录</v-btn>
+            <v-btn href="/login" color="primary" variant="flat">登录</v-btn>
 
         </v-container>
     </v-app-bar>
@@ -44,5 +42,4 @@
 <script setup>
 </script>
 
-<style scoped>
-</style>
+<style scoped></style>

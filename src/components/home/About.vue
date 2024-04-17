@@ -1,7 +1,7 @@
 <template>
     <v-container class="about-us" style="padding-top: 128px;">
         <h2 class="text-center text-h3" style="padding-bottom: 64px;">关于我们</h2>
-        <p>{{ description }}</p>
+        <v-row class="mb-4">{{ description }}</v-row>
         <v-row>
             <v-col v-for="(member, index) in teamMembers" :key="index" cols="12" md="6">
                 <v-card>
