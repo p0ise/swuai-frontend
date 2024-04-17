@@ -23,7 +23,7 @@ export default {
             description: 'SWU X FACE 是一个致力于利用人工智能技术来解决实际问题的团队。',
             teamMembers: [
                 {
-                    name: '姚舜',
+                    name: '张三',
                     role: '项目经理',
                     profileLink: '#'
                 },
