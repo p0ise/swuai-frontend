@@ -6,12 +6,9 @@
                 <v-form ref="form" @submit.prevent="submit" class="mx-auto" style="max-width: 500px;">
                     <image-upload v-model="image"></image-upload>
                     <v-row justify="center" class="my-0">
-                        <v-btn color="primary" type="submit" :disabled="loading">{{ loading ? '分析中...' : '分析' }}</v-btn>
+                        <v-btn color="primary" type="submit" :loading="loading">分析</v-btn>
                     </v-row>
                 </v-form>
-                <v-row justify="center" class="mb-0 mt-3" v-if="loading">
-                    <v-progress-circular indeterminate color="primary"></v-progress-circular>
-                </v-row>
                 <v-row class="mb-0 mt-3" v-if="result && !loading">
                     <v-alert type="info" dense>
                         <template v-for="(value, key) in result">

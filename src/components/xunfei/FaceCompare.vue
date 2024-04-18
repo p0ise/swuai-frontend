@@ -14,12 +14,9 @@
                     </v-col>
                 </v-row>
                 <v-row class="my-0" justify="center">
-                    <v-btn color="primary" @click="compareFaces" :disabled="loading">
-                        {{ loading ? '分析中...' : '开始比对' }}
+                    <v-btn color="primary" @click="compareFaces" :loading="loading">
+                        开始比对
                     </v-btn>
-                </v-row>
-                <v-row class="my-0" justify="center" v-if="loading">
-                    <v-progress-circular indeterminate color="primary" class="mt-3"></v-progress-circular>
                 </v-row>
                 <!-- 提示信息或比对结果 -->
                 <v-row class="my-0" v-if="result && !loading">
